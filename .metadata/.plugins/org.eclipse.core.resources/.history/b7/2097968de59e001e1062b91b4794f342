@@ -1,0 +1,64 @@
+package com.examen.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.examen.model.Categoria;
+import com.examen.service.ICategoriaService;
+
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/categoria")
+public class CategoriaController {
+
+	@Autowired
+	ICategoriaService iCategoriaService;
+	
+	@GetMapping
+	public ResponseEntity<List<Categoria>> listar(){
+		List<Categoria> lista = iCategoriaService.listar();
+		return new ResponseEntity<List<Categoria>>(lista, HttpStatus.OK);
+	}
+	
+	@PostMapping
+	public ResponseEntity<Categoria> registrar(@RequestBody Categoria categoria){
+		Categoria cat = iCategoriaService.registrar(categoria);
+		return new ResponseEntity<Categoria>(cat, HttpStatus.CREATED);
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<Categoria> actualizar(@RequestBody Categoria categoria, @PathVariable("id") int id){
+		Categoria categoriaExistente = iCategoriaService.listarPorId(id);
+		
+		if(categoriaExistente == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		categoriaExistente.setNombre(categoria.getNombre());
+			
+		Categoria categoriaActualizada = iCategoriaService.actualizar(categoriaExistente);
+		return new ResponseEntity<Categoria>(categoriaActualizada,HttpStatus.OK);
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> eliminar(@PathVariable("id") int id) {
+		Categoria categoria = iCategoriaService.listarPorId(id);
+		if (categoria != null)
+			iCategoriaService.eliminar(id);
+		
+		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+	}
+	
+}

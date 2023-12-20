@@ -1,0 +1,43 @@
+package com.examen.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.examen.model.Docente;
+import com.examen.repository.IDocenteRepository;
+import com.examen.service.IDocenteService;
+
+@Service
+public class IDocenteServiceImpl implements IDocenteService{
+
+	@Autowired
+	IDocenteRepository iDocenteRepository;
+	
+	@Override
+	public List<Docente> listar() {
+		return iDocenteRepository.findAll();
+	}
+
+	@Override
+	public Docente registrar(Docente docente) {
+		return iDocenteRepository.save(docente);
+	}
+
+	@Override
+	public Docente actualizar(Docente docente) {
+		return iDocenteRepository.save(docente);
+	}
+
+	@Override
+	public void eliminar(int id) {
+		iDocenteRepository.deleteById(id);
+	}
+
+	@Override
+	public Docente listarPorId(int id) {
+		return iDocenteRepository.findById(id).get();
+	}
+
+}

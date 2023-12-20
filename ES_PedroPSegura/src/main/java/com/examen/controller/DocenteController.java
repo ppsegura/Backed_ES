@@ -1,0 +1,79 @@
+package com.examen.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.examen.model.Docente;
+import com.examen.service.IDocenteService;
+
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/docente")
+public class DocenteController {
+
+	@Autowired
+	IDocenteService iDocenteService;
+	
+	@GetMapping
+	public ResponseEntity<List<Docente>> listar(){
+		List<Docente> lista = iDocenteService.listar();
+		return new ResponseEntity<List<Docente>>(lista, HttpStatus.OK);
+	}
+	
+	@PostMapping
+	public ResponseEntity<Docente> registrar(@RequestBody Docente docente){
+		Docente doc = iDocenteService.registrar(docente);
+		return new ResponseEntity<Docente>(doc, HttpStatus.CREATED);
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<Docente> actualizar(@RequestBody Docente docente, @PathVariable("id") int id){
+		Docente docenteExistente = iDocenteService.listarPorId(id);
+		
+		if(docenteExistente == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		docenteExistente.setNombre(docente.getNombre());
+		docenteExistente.setDni(docente.getDni());
+		docenteExistente.setFecha_nacimiento(docente.getFecha_nacimiento());
+		docenteExistente.setSueldo(docente.getSueldo());
+		docenteExistente.setEmail(docente.getEmail());
+		docenteExistente.setSexo(docente.getSexo());
+		docenteExistente.setCategoria(docente.getCategoria());
+			
+		Docente docenteActualizado = iDocenteService.actualizar(docenteExistente);
+		return new ResponseEntity<Docente>(docenteActualizado,HttpStatus.OK);
+	}
+	
+	@GetMapping("{id}")
+	public ResponseEntity<Docente> listarPorId(@PathVariable("id") int id){
+		Docente docente = iDocenteService.listarPorId(id);
+		if(docente.getId_docente() > 0 ) {
+			return new ResponseEntity<Docente>(docente,HttpStatus.OK);
+		} else
+			return new ResponseEntity<Docente>(docente,HttpStatus.NO_CONTENT);
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> eliminar(@PathVariable("id") int id) {
+		Docente docente = iDocenteService.listarPorId(id);
+		if (docente != null)
+			iDocenteService.eliminar(id);
+		
+		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+	}
+	
+}
